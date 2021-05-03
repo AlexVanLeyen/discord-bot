@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 const client = new Client()
+const log = console
 const token = process.env.DISCORD_BOT_TOKEN
 const prefix = process.env.BOT_COMMAND_PREFIX ?? '!'
 
@@ -11,7 +12,7 @@ if (!token) {
 }
 
 client.once('ready', () => {
-  console.log('Congratulations, your Discord bot has been successfully initialized!')
+  log.info('Congratulations, your Discord bot has been successfully initialized!')
 })
 
 client.on('message', (message: Message) => {
