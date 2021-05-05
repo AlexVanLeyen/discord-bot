@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { Client, Message } from 'discord.js'
 import dotenv from 'dotenv'
 
