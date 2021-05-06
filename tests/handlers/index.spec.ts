@@ -1,5 +1,6 @@
 import { Message } from 'discord.js'
-import { messageHandler } from '../src/handlers'
+import { messageHandler } from '../../src/handlers'
+import { prefix } from '../../src/config/env'
 
 describe('Message Handler', () => {
   const message = ({
@@ -12,8 +13,6 @@ describe('Message Handler', () => {
     }
   } as unknown) as Message
 
-  const prefix = process.env.BOT_COMMAND_PREFIX ?? '!'
-
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -22,5 +21,11 @@ describe('Message Handler', () => {
     message.content = `${prefix}ping`
     await messageHandler(message)
     expect(message.channel.send).toHaveBeenCalledWith('Pong.')
+  })
+
+  it('should do nothing when not pinged', async () => {
+    message.content = 'hello'
+    await messageHandler(message)
+    expect(message.channel.send).not.toHaveBeenCalledWith('Pong.')
   })
 })

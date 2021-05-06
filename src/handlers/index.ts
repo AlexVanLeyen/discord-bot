@@ -1,6 +1,5 @@
 import { Message } from 'discord.js'
-
-const prefix = process.env.BOT_COMMAND_PREFIX ?? '!'
+import { prefix } from '@/config/env'
 
 export const messageHandler = async (message: Message) => {
   if (message.content === `${prefix}ping`) {
