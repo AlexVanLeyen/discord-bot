@@ -1,11 +1,8 @@
-import { Message, Collection, Client } from 'discord.js'
+import { Message, Client } from 'discord.js'
 import { prefix } from '@/config/env'
-import { Ping, CommandInterface } from '@/commands'
+import { CommandCollection } from '@/types'
 
-const commands = new Collection<string, CommandInterface>()
-commands.set('ping', Ping)
-
-export const handler = async (client: Client, message: Message) => {
+export const handler = (client: Client, commands: CommandCollection, message: Message) => {
   if (!message.content.startsWith(prefix) || message.author.bot) return
   const args = message.content.slice(prefix.length).trim().split((/ +/g))
   const command = (args.shift() ?? '').toLowerCase()
