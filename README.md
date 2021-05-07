@@ -1,13 +1,11 @@
 # :robot: Discord Bot
-Learning to bot with discord
-
 Discord Bot contains the "minimum" needed to operate a new bot on discord.
 
 ## Getting Started
 
 ### DEPENDENCIES: 
 You will need to have the following tools installed on your machine
-- nodejs
+- nodejs ^15.12.0
 - npm
 - git bash (if on windows)
 
