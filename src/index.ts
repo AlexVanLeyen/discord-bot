@@ -1,21 +1,17 @@
 #!/usr/bin/env node
 import { Client } from 'discord.js'
-import { messageHandler } from '@/handlers'
+import Bot, { BotConfig } from '@/bot'
 import dotenv from 'dotenv'
 
 dotenv.config()
 const client = new Client()
-const log = console
-const token = process.env.DISCORD_BOT_TOKEN
-
+const path = process.env.DISCORD_BOT_DIST_PATH ?? `${process.cwd()}/dist`
+const token = process.env.DISCORD_BOT_TOKEN ?? ''
 if (!token) {
   throw new Error('Missing required DISCORD_BOT_TOKEN')
 }
 
-client.once('ready', () => {
-  log.info('Congratulations, your Discord bot has been successfully initialized!')
-})
+const config: BotConfig = { client, path, token }
+const bot = new Bot(config)
 
-client.on('message', messageHandler)
-
-client.login(token)
+bot.run()
