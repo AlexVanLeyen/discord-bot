@@ -1,5 +1,5 @@
-import { handler } from '../../src/events/ready'
-import { log } from '../../src/utils/log'
+import { handler } from '@/events/ready'
+import { log } from '@/utils/log'
 
 describe('ready event handler', () => {
   it('says it is ready', () => {

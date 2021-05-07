@@ -1,70 +1,56 @@
 import { promises as fs } from 'fs'
-import { Client as DiscordClient, Collection as DiscordCollection } from 'discord.js'
-import { EventCollection, EventInterface, CommandCollection, CommandInterface } from '@/types'
+import { Collection as DiscordCollection } from 'discord.js'
+import { Collection } from '@/types'
 import { log } from '@/utils/log'
 
-interface loaderOpts {
-  path: string
-  client: DiscordClient
+/**
+ * @param path
+ * @returns a promise containing a collection filled with modules that match the given ModuleInterface
+ */
+export async function loadCollection <ModuleInterface> (path: string): Promise<Collection<ModuleInterface>> {
+  const collection = new DiscordCollection<string, ModuleInterface>()
+  const files = await fs.readdir(path).catch((err) => {
+    log.error(err)
+    return []
+  })
+  files.forEach((file) => {
+    if (!isValidFile(file)) return
+    const name = getNameFromFile(file)
+    try {
+      const module = loadModuleWithoutCache<ModuleInterface>(`${path}/${file}`)
+      collection.set(name, module)
+    } catch (err) {
+      log.error(err)
+    }
+  })
+  return collection
 }
 
-export default class loader {
-  private path: string
-  private client: DiscordClient
+/**
+ * @param file
+ * @returns
+ */
+function getNameFromFile (file: string): string {
+  return file.split('.')[0]
+}
 
-  constructor (opts: loaderOpts) {
-    this.path = opts.path
-    this.client = opts.client
-  }
+/**
+ * Determine if the file is a valid module
+ * @param file
+ * @returns
+ */
+function isValidFile (file: string): boolean {
+  return file.endsWith('.js')
+}
 
-  public async load (): Promise<void> {
-    const commands = await this.loadCommands()
-    const events = await this.loadEvents()
-    events.forEach((event, eventName) => {
-      this.client.on(eventName, event.handler.bind(null, this.client, commands))
-    })
-  }
-
-  private async loadEvents (): Promise<EventCollection> {
-    const eventPath = `${this.path}/events`
-    const events = new DiscordCollection <string, EventInterface>()
-    const files = await fs.readdir(eventPath).catch((err) => {
-      log.error(err)
-      return []
-    })
-    files.forEach(file => {
-      if (!this.isValidFile(file)) return
-      const fullPath = `${eventPath}/${file}`
-      const event = require(fullPath)
-      const eventName = this.getEventNameFromFile(file)
-      events.set(eventName, event)
-      delete require.cache[require.resolve(fullPath)]
-    })
-    return events
-  }
-
-  private async loadCommands (): Promise<CommandCollection> {
-    const commandPath = `${this.path}/commands`
-    const commands = new DiscordCollection<string, CommandInterface>()
-    const files = await fs.readdir(commandPath).catch((err) => {
-      log.error(err)
-      return []
-    })
-    files.forEach(file => {
-      if (!this.isValidFile(file)) return
-      const fullPath = `${commandPath}/${file}`
-      const props = require(fullPath)
-      const commandName = file.split('.')[0]
-      commands.set(commandName, props)
-    })
-    return commands
-  }
-
-  private getEventNameFromFile (file: string): string {
-    return file.split('.')[0]
-  }
-
-  private isValidFile (file: string): boolean {
-    return file.endsWith('.js')
-  }
+/**
+ * Loads a module from path, but removes it from
+ * the require cache.
+ * @param path
+ * @returns the loaded module
+ */
+function loadModuleWithoutCache <ModuleInterface> (path: string) {
+  const module: ModuleInterface = require(path)
+  delete require.cache[require.resolve(path)]
+  return module
 }

@@ -1,6 +1,6 @@
 import { Message as DiscordMessage, Client as DiscordClient, Collection as DiscordCollection } from 'discord.js'
-import { handler } from '../../src/events/message'
-import { prefix } from '../../src/config/env'
+import { handler } from '@/events/message'
+import { prefix } from '@/config/env'
 
 describe('Message Handler', () => {
   const pong = 'Pong.'
